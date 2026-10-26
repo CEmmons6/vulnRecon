@@ -15,178 +15,93 @@ source .venv/bin/activate
 
 # Function to handle errors with manual installation solutions
 handle_error_with_solution() {
-    echo -e "${RED}Error occurred during the execution of $1. Exiting step but continuing with the next installation.${NC}"
+    echo -e "${BOLD_RED}[${BOLD_WHITE}✗${BOLD_RED}]${NC} ${BOLD_WHITE}Error during $1${DIM} - continuing with next step${NC}"
     echo "Error during: $1" >> error.log
-    echo -e "${YELLOW}Possible Solution for manual installation:${NC}"
-    echo -e "${BOLD_WHITE}$2${NC}"
+    echo -e "${BOLD_YELLOW}[${BOLD_WHITE}!${BOLD_YELLOW}]${NC} ${BOLD_WHITE}Manual fix:${NC} $2"
 }
 
-# Define colors
+# Define colors - vulnRecon Theme
+# Primary: Cyan/Teal | Secondary: Magenta | Success: Green | Warning: Yellow | Error: Red | Info: Blue
+BOLD='\033[1m'
+DIM='\033[2m'
+RED='\033[91m'
+BOLD_RED='\033[1;91m'
+GREEN='\033[92m'
+BRIGHT_GREEN='\033[1;92m'
+YELLOW='\033[93m'
+BLUE='\033[94m'
+MAGENTA='\033[95m'
+CYAN='\033[96m'
+BOLD_CYAN='\033[1;96m'
+BOLD_MAGENTA='\033[1;95m'
+BOLD_BLUE='\033[1;94m'
 BOLD_WHITE='\033[1;97m'
-BOLD_BLUE='\033[1;34m'
-RED='\033[0;31m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
+BOLD_YELLOW='\033[1;93m'
+BOLD_GREEN='\033[1;92m'
 NC='\033[0m'  # No Color
 
 # Function to handle errors
 handle_error() {
-    echo -e "${RED}Error occurred during the execution of $1. Exiting.${NC}"
+    echo -e "${BOLD_RED}[${BOLD_WHITE}✗${BOLD_RED}]${NC} ${BOLD_WHITE}Critical error in $1${NC}"
     echo "Error during: $1" >> error.log
     exit 1
 }
 
 # Function to show progress with emoji
 show_progress() {
-    echo -e "${BOLD_BLUE}Current process: $1...⌛️${NC}"
+    echo -e "${BOLD_CYAN}[${BOLD_WHITE}⌛${BOLD_CYAN}]${NC} ${BOLD_WHITE}$1${DIM}...${NC}"
 }
 
 # Function to check if a command exists and is executable
 check_command() {
     if ! command -v "$1" &> /dev/null; then
-        echo -e "${RED}$1 could not be found or is not installed correctly.${NC}"
+        echo -e "${BOLD_RED}[${BOLD_WHITE}✗${BOLD_RED}]${NC} ${BOLD_WHITE}$1 not found${NC}"
         handle_error "$1 installation check"
     else
-        echo -e "${BOLD_BLUE}$1 installed correctly.${NC}"
+        echo -e "${BOLD_GREEN}[${BOLD_WHITE}✓${BOLD_GREEN}]${NC} ${BOLD_WHITE}$1 installed${NC}"
     fi
 }
 
 # Clear the terminal
 clear
 
-# Display banner
-echo -e "${BOLD_BLUE}"
-echo "               ___         ____                              _____ "
-echo "__  _____ ___ / _ \ _ __  |  _ \ ___  ___ ___  _ __   __   _|___ / "
-echo "\ \/ / __/ __| | | | '__| | |_) / _ \/ __/ _ \| '_ \  \ \ / / |_ \ "
-echo " >  <\__ \__ \ |_| | |    |  _ <  __/ (_| (_) | | | |  \ V / ___) |"
-echo "/_/\_\___/___/\___/|_|    |_| \_\___|\___\___/|_| |_|   \_/ |____/ "
-echo "                           xss0r Recon v3"
-echo -e "${NC}"
-
-# Centered Contact Information
-echo -e "${BOLD_BLUE}                      Website: store.xss0r.com${NC}"
-echo -e "${BOLD_BLUE}                      Free BlindXSS Testing: xss0r.com${NC}"
-echo -e "${BOLD_BLUE}                      X: x.com/xss0r${NC}"
+# Display banner using echo -e with color variables and escaped backslashes
+echo -e "${BOLD_CYAN}             .__        __________${RESET}"
+echo -e "${BOLD_CYAN}___  ____ __|  |   ____\\______   \\ ____   ____  ____   ____${RESET}"
+echo -e "${BOLD_CYAN}\\  \\/ /  |  \\  |  /    \\|       _// __ \\_/ ___\\/  _ \\ /    \\ ${RESET}"
+echo -e "${BOLD_CYAN} \\   /|  |  /  |_|   |  \\    |   \\  ___/\\  \\__(  <_> )   |  \\${RESET}"
+echo -e "${BOLD_CYAN}  \\_/ |____/|____/___|  /____|_  /\\___  >\\___  >____/|___|  /${RESET}"
+echo -e "${BOLD_CYAN}                      \\/       \\/     \\/     \\/           \\/ ${RESET}"
+echo -e "${BOLD_MAGENTA}             .__        __________${RESET}"
+echo -e "${BOLD_MAGENTA}___  ____ __|  |   ____\\______   \\ ____   ____  ____   ____${RESET}"
+echo -e "${BOLD_MAGENTA}\\  \\/ /  |  \\  |  /    \\|       _// __ \\_/ ___\\/  _ \\ /    \\ ${RESET}"
+echo -e "${BOLD_MAGENTA} \\   /|  |  /  |_|   |  \\    |   \\  ___/\\  \\__(  <_> )   |  \\${RESET}"
+echo -e "${BOLD_MAGENTA}  \\_/ |____/|____/___|  /____|_  /\\___  >\\___  >____/|___|  /${RESET}"
+echo -e "${BOLD_MAGENTA}                      \\/       \\/     \\/     \\/           \\/ ${RESET}"
+echo -e "${BOLD_CYAN}════════════════════════════════════════════════════════════════════════════════${RESET}"
+echo -e "${BOLD_MAGENTA}    ■ Vulnerability Reconnaissance Framework${RESET}${BOLD_CYAN}"
+echo -e "${BOLD_WHITE}    Query Parameter & Path-Based XSS Detection${RESET}${BOLD_CYAN}"
+echo -e "${BOLD_CYAN}════════════════════════════════════════════════════════════════════════════════${RESET}"
 
 # Function to display options
 display_options() {
-    echo -e "${BOLD_BLUE}Please select an option:${NC}"
-    echo -e "${RED}1: Install all tools${NC}"
-    echo -e "${RED}2: Enter a domain name of the target${NC}"
-    echo -e "${YELLOW}3: Domain Enumeration and Filtering${NC}"
-    echo -e "${YELLOW}4: URL Crawling and Filtering${NC}"
-    echo -e "${YELLOW}5: In-depth URL Filtering${NC}"
-    echo -e "${YELLOW}6: HiddenParamFinder${NC}"
-    echo -e "${YELLOW}7: Preparing for XSS Detection and Query String URL Analysis${NC}"
-    echo -e "${YELLOW}8: Launching xss0r Tool${NC}"
-    echo -e "${YELLOW}9: Exit${NC}"
-    echo -e "${YELLOW}10: Guide to Deploying xss0r on VPS Servers${NC}"
-    echo -e "${YELLOW}11: Path-based XSS${NC}"
-    echo -e "${YELLOW}12: Domains Search Inputs${NC}"
+    echo -e "${BOLD_CYAN}════════════════════════════════════════════════════════════════════════════════"
+    echo -e "${BOLD_WHITE}                            AVAILABLE MODULES${NC}${BOLD_CYAN}"
+    echo -e "${BOLD_CYAN}════════════════════════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD_GREEN}  ${BOLD_WHITE}1${BOLD_CYAN}  ${BOLD_WHITE}Install All Tools${NC}                  ${DIM}→${NC} ${CYAN}Setup dependencies & reconnaissance tools${NC}"
+    echo -e "${BOLD_GREEN}  ${BOLD_WHITE}2${BOLD_CYAN}  ${BOLD_WHITE}Set Target Domain${NC}                    ${DIM}→${NC} ${CYAN}Define the target for reconnaissance${NC}"
+    echo -e "${BOLD_BLUE}  ${BOLD_WHITE}3${BOLD_CYAN}  ${BOLD_WHITE}Domain Enumeration & Filtering${NC}       ${DIM}→${NC} ${CYAN}Discover & filter subdomains${NC}"
+    echo -e "${BOLD_BLUE}  ${BOLD_WHITE}4${BOLD_CYAN}  ${BOLD_WHITE}URL Crawling & Filtering${NC}             ${DIM}→${NC} ${CYAN}Crawl & collect URLs from targets${NC}"
+    echo -e "${BOLD_BLUE}  ${BOLD_WHITE}5${BOLD_CYAN}  ${BOLD_WHITE}In-depth URL Filtering${NC}               ${DIM}→${NC} ${CYAN}Advanced URL parameter analysis${NC}"
+    echo -e "${BOLD_BLUE}  ${BOLD_WHITE}6${BOLD_CYAN}  ${BOLD_WHITE}Hidden Parameter Finder${NC}              ${DIM}→${NC} ${CYAN}Discover hidden parameters with Arjun${NC}"
+    echo -e "${BOLD_BLUE}  ${BOLD_WHITE}7${BOLD_CYAN}  ${BOLD_WHITE}XSS Detection - Query Parameters${NC}     ${DIM}→${NC} ${CYAN}Reflection-based XSS scanning${NC}"
+    echo -e "${BOLD_MAGENTA}  ${BOLD_WHITE}8${BOLD_CYAN}  ${BOLD_WHITE}Path-based XSS Detection${NC}             ${DIM}→${NC} ${CYAN}Path reflection XSS scanning${NC}"
+    echo -e "${BOLD_MAGENTA}  ${BOLD_WHITE}9${BOLD_CYAN}  ${BOLD_WHITE}Domains Search Inputs${NC}                ${DIM}→${NC} ${CYAN}Search query appending & testing${NC}"
+    echo -e "${BOLD_RED}   ${BOLD_WHITE}10${BOLD_CYAN} ${BOLD_WHITE}Exit${NC}                                 ${DIM}→${NC} ${CYAN}Exit the framework${NC}"
+    echo -e "${BOLD_CYAN}════════════════════════════════════════════════════════════════════════════════${NC}"
 }
 
 
-# Function to display Guide to Deploying xss0r on VPS Servers information with better formatting and crystal-like color
-show_vps_info() {
-    echo -e "${CYAN}To run xss0r continuously on bug bounty programs and keep it running in the background, a VPS server is highly recommended.${NC}"
-    echo -e "${CYAN}I personally recommend Contabo, which I've been using for the past three years. It has performed reliably without any restrictions.${NC}"
-    echo -e "${CYAN}Additionally, the pricing is very competitive.${NC}\n"
-    
-    echo -e "${CYAN}Here is the link to purchase the Contabo VPS 2 server Debian OS:${NC}"
-    echo -e "${CYAN}Make sure to select under OS settings to be DEBIAN OS 12:${NC}"
-    echo -e "${CYAN}https://contabo.com/en/vps/cloud-vps-2/?image=debian.329&qty=1&contract=1&storage-type=vps2-400-gb-sdd${NC}\n"
-    echo -e "${CYAN}You can select any plan from Contabo Hosting https://contabo.com/en/vps/${NC}\n"
-    
-    echo -e "${CYAN}After completing the purchase, you can expect to receive your credentials via email within 15 minutes to 3 hours.${NC}\n"
-    
-    echo -e "${CYAN}Next, update your VPS and install tmux to allow xss0r to run in the background.${NC}\n"
-    
-    echo -e "${CYAN}Below are the essential tmux commands:${NC}\n"
-    
-    echo -e "${CYAN}#### Start a new tmux session:${NC}"
-    echo -e "${CYAN}apt install tmux                          # Install tmux${NC}"
-    echo -e "${CYAN}tmux new-session -s xss0r                 # Create a new tmux session${NC}"
-    echo -e "${CYAN}tmux attach-session -t xss0r              # Reattach to an existing tmux session from another terminal tab${NC}"
-    echo -e "${CYAN}tmux detach -s xss0r                      # Detach from the tmux session${NC}"
-    echo -e "${CYAN}tmux kill-session -t xss0r                # Terminate the xss0r tmux session${NC}"
-    echo -e "${CYAN}tmux kill-server                          # Terminate all tmux sessions${NC}"
-    echo -e "${CYAN}tmux ls                                   # List all active tmux sessions${NC}\n"
-    
-echo -e "${CYAN}#### Install and Configure Cockpit https://YourVpsIP:9090${NC}"
-echo -e "${CYAN}#### Cockpit it WEB GUI for SSH with many features like Navigator (File Manmager) for quick upload/download files:${NC}"
-echo -e "${CYAN}sudo apt install cockpit cockpit-podman -y  # Install Cockpit and Podman support${NC}"
-echo -e "${CYAN}sudo systemctl start cockpit               # Start Cockpit service${NC}"
-echo -e "${CYAN}sudo systemctl enable cockpit              # Enable Cockpit to start on boot${NC}"
-echo -e "${CYAN}sudo apt install ufw -y                    # Install UFW firewall${NC}"
-echo -e "${CYAN}sudo ufw enable                            # Enable UFW firewall${NC}"
-echo -e "${CYAN}sudo ufw allow 9090                        # Allow Cockpit access on port 9090${NC}"
-echo -e "${CYAN}sudo ufw allow 80                          # Allow HTTP access${NC}"
-echo -e "${CYAN}sudo ufw allow 22                          # Allow SSH access${NC}"
-echo -e "${CYAN}sudo ufw allow 3389                        # Allow RDP access${NC}"
-echo -e "${CYAN}sudo ufw reload                            # Reload UFW rules${NC}\n"
-echo -e "${CYAN}sudo ufw allow 22/tcp                      # Allow ssh over tcp${NC}\n"
-echo -e "${CYAN}sudo ufw allow ssh                         # Allow ssh
-echo -e "${CYAN}Configure Cockpit to Allow                 # Unencrypted Access and Root Login:${NC}"
-echo -e "${CYAN}sudo nano /etc/cockpit/cockpit.conf        # Add settings to cockpit.conf${NC}"
-echo -e "${CYAN}[WebService]\nAllowUnencrypted = true\nLogin= root\n" # Configuration content for cockpit.conf
-echo -e "${CYAN}sudo systemctl restart cockpit             # Restart Cockpit service to apply changes${NC}"
-echo -e "${CYAN}sudo apt-get upgrade cockpit               # Upgrade Cockpit${NC}"
-echo -e "${CYAN}sudo nano /etc/cockpit/disallowed-users    # Delete 'root' user from disallowed-users${NC}"
-echo -e "${CYAN}sudo nano /etc/pam.d/cockpit               # Comment pam_listfile.so item=user sense=deny line${NC}"
-echo -e "${CYAN}sudo mkdir -p /etc/cockpit/ws-certs.d      # Create directory for certificates${NC}"
-echo -e "${CYAN}sudo rm /etc/cockpit/ws-certs.d/0-self-signed.cert # Remove self-signed cert${NC}"
-echo -e "${CYAN}sudo systemctl restart cockpit             # Restart Cockpit service${NC}\n"
-
-echo -e "${CYAN}#### Install Cockpit Navigator Plugin & ZIP archive:${NC}"
-echo -e "${CYAN}sudo apt-get install rsync zip  # Install rsync zip${NC}"
-echo -e "${CYAN}sudo apt-get install unzip  # Install unzip ${NC}"
-echo -e "${CYAN}sudo apt-get install p7zip-full  # Install p7zip${NC}"
-echo -e "${CYAN}wget https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb  # Download Cockpit Navigator${NC}"
-echo -e "${CYAN}sudo dpkg -i cockpit-navigator_0.5.10-1focal_all.deb  # Install Cockpit Navigator${NC}"
-echo -e "${CYAN}Navigate to https://YourVpsIP:9090/navigator  # Access Cockpit Navigator in your browser${NC}\n"
-
-echo -e "${CYAN}#### Install Kali Linux and Desktop Environment:${NC}"
-echo -e "${CYAN}sudo nano /etc/apt/sources.list             # Add Kali repository to sources.list${NC}"
-echo -e "${CYAN}deb http://http.kali.org/kali kali-rolling main contrib non-free non-free-firmware\n"
-echo -e "${CYAN}wget -q -O - https://archive.kali.org/archive-key.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/kali-archive-keyring.gpg # Import Kali keyring${NC}"
-echo -e "${CYAN}sudo apt update                             # Update package list${NC}"
-echo -e "${CYAN}sudo apt upgrade                            # Upgrade packages${NC}"
-echo -e "${CYAN}sudo apt full-upgrade                       # Full system upgrade${NC}"
-echo -e "${CYAN}sudo apt dist-upgrade                       # Distribution upgrade${NC}"
-echo -e "${CYAN}sudo apt -y install kali-linux-everything   # Install all Kali tools${NC}"
-echo -e "${CYAN}sudo apt install kali-desktop-gnome         # Install Kali GNOME Desktop${NC}"
-echo -e "${CYAN}sudo apt install kali-linux-default         # Install default Kali packages${NC}"
-echo -e "${CYAN}sudo apt update --fix-missing               # Fix missing dependencies${NC}"
-echo -e "${CYAN}sudo apt --fix-broken install               # Fix broken installations${NC}"
-echo -e "${CYAN}sudo dpkg --configure -a                    # Reconfigure dpkg${NC}"
-echo -e "${CYAN}sudo update-alternatives --config x-session-manager  # Configure session manager${NC}"
-echo -e "${CYAN}sudo apt -y install kali-root-login         # Enable root login${NC}"
-echo -e "${CYAN}sudo passwd                                 # Set root password${NC}"
-echo -e "${CYAN}sudo apt autoremove                         # Remove unnecessary packages${NC}"
-echo -e "${CYAN}sudo apt clean                              # Clean up package cache${NC}\n"
-echo -e "${CYAN}sudo reboot                                 # Update changes to VPS server${NC}\n"
-
-
-# Steps for installing xss0r on VPS
-echo -e "${CYAN}#### Steps for installing xss0r on VPS:${NC}"
-
-echo -e "${CYAN}1. Install Cockpit                         ${NC} # Install Cockpit for VPS management"
-echo -e "${CYAN}2. Install Debian                          ${NC} # Install the Debian OS"
-echo -e "${CYAN}3. nano /etc/apt/sources.list              ${NC} # Edit source list in Debian OS"
-echo -e "${CYAN}4. deb http://asi-fs-d.contabo.net/debian bookworm main non-free-firmware  ${NC} # Change 'bookworm' to 'testing'"
-echo -e "${CYAN}5. deb-src http://asi-fs-d.contabo.net/debian bookworm main non-free-firmware ${NC} # Change 'bookworm' to 'testing'"
-echo -e "${CYAN}6. Update & Upgrade                        ${NC} # sudo apt update && sudo apt install libc6 -y && sudo apt install gnome -y"
-echo -e "${CYAN}7. Install Kali OS                         ${NC} # Not needed any changes except updates & upgrades"
-echo -e "${CYAN}8. Upload all files to your VPS            ${NC} # Upload xss0r + xss0rRecon files"
-echo -e "${CYAN}9. chmod +x xss0r                          ${NC} # Add execute permission to the xss0r tool"
-echo -e "${CYAN}10. Install required Chrome version from the eBook ${NC} # Install the required Chrome version as outlined in the eBook"
-echo -e "${CYAN}11. Run xss0r and enter API License         ${NC} # Run xss0r tool and enter your API license"
-echo -e "${CYAN}12. Run xss0rRecon and install all tools   ${NC} # Run xss0rRecon and install necessary tools"
-echo -e "${CYAN}13. Ensure all files in the same folder    ${NC} # Make sure all files are inside the same folder"
-echo -e "${CYAN}14. Run xss0r tool                         ${NC} # Launch and run xss0r tool"
-
-}
 
 # Initialize a variable for the domain name
 domain_name=""
@@ -269,8 +184,8 @@ fi
     # Remove conflicting package if it exists
     sudo apt remove -y python3-structlog
 
-    # Set full permissions for the xss0rRecon script
-    sudo chmod 755 xss0rRecon.sh
+    # Set full permissions for the vulnRecon script
+    sudo chmod 755 vulnRecon.sh
 
     # Step 1: Install Python3 virtual environment and structlog in venv
     show_progress "Installing python3-venv and setting up virtual environment"
@@ -1055,16 +970,16 @@ echo -e "${BOLD_BLUE}|                                                          
 echo -e "${BOLD_BLUE}|  Alongside the xss0r tool, you'll also need two wordlists and a 2 Pythons reflection       |${NC}"
 echo -e "${BOLD_BLUE}|  detection tools. All of these can be found in any of the XSS plans available on the site. |${NC}"
 echo -e "${BOLD_BLUE}|                                                                                            |${NC}"
-echo -e "${BOLD_BLUE}|  You can get them by visiting: https://store.xss0r.com/ and purchasing any plan that       |${NC}"
+echo -e "${BOLD_BLUE}|  You can get them by visiting the project repository and purchasing any plan that       |${NC}"
 echo -e "${BOLD_BLUE}|  fits your needs.                                                                          |${NC}"
 echo -e "${BOLD_BLUE}|                                                                                            |${NC}"
 echo -e "${BOLD_BLUE}|  If you already have a plan, simply copy the xss0r tool, the wordlists, and the            |${NC}"
-echo -e "${BOLD_BLUE}|  reflection detection tool into the same folder where your xss0rRecon tool is located.     |${NC}"
+echo -e "${BOLD_BLUE}|  reflection detection tool into the same folder where your vulnRecon tool is located.     |${NC}"
 echo -e "${BOLD_BLUE}|                                                                                            |${NC}"
 echo -e "${BOLD_BLUE}|  Alternatively, if you don't have a plan or the tools, you can use the PRO plan for free   |${NC}"
 echo -e "${BOLD_BLUE}|  for 5 days each month from the 10th to the 15th.                                          |${NC}"
 echo -e "${BOLD_BLUE}|                                                                                            |${NC}"
-echo -e "${BOLD_BLUE}|  The release of the key is posted on the homepage banner at store.xss0r.com, but this      |${NC}"
+echo -e "${BOLD_BLUE}|  The release of the key is posted on the project page, but this      |${NC}"
 echo -e "${BOLD_BLUE}|  option is only available for those who have not yet tested the tool.                      |${NC}"
 echo -e "${BOLD_BLUE}|                                                                                            |${NC}"
 echo -e "${BOLD_BLUE}=============================================================================================${NC}"
@@ -1118,7 +1033,7 @@ run_step_3() {
     fi
 
     echo -e "${BOLD_WHITE}You selected: Domain Enumeration and Filtering for $domain_name${NC}"
-    echo -e "${BOLD_WHITE}Do you want to use your own list of domains or xss0rRecon to find it for you? Enter Y for your list or N for xss0rRecon list - domain list must be in format ${domain_name}-domains.txt: ${NC}"
+    echo -e "${BOLD_WHITE}Do you want to use your own list of domains or vulnRecon to find it for you? Enter Y for your list or N for vulnRecon list - domain list must be in format ${domain_name}-domains.txt: ${NC}"
     read user_choice
 
     # Convert user input to uppercase
@@ -1939,35 +1854,6 @@ else
 fi
 }
 
-# Function to run step 8 (Launching xss0r Tool)
-run_step_8() {
-    echo -e "${BOLD_WHITE}You selected: Launching xss0r Tool for $domain_name${NC}"
-
-    # Check if xss0r and xss-urls.txt files exist
-    if [ -f "xss0r" ] && [ -f "xss-urls.txt" ]; then
-        show_progress "Running xss0r for XSS vulnerabilities"
-        ./xss0r --get --urls xss-urls.txt --payloads payloads.txt --shuffle --threads 10 --path
-        if [[ $? -ne 0 ]]; then  # Check if xss0r command failed
-            echo -e "${RED}The xss0r Tool encountered an error during execution.${NC}"
-            exit 1
-        fi
-        sleep 5
-        echo -e "${BOLD_BLUE}xss0r completed. Check the output files for results.${NC}"
-    else
-        # Custom error message when xss0r is missing
-        if [ ! -f "xss0r" ]; then
-            echo -e "${RED}The xss0r Tool is not present in the current directory.${NC}"
-            echo -e "${CYAN}Please ensure the xss0r tool is placed in the directory and run the script again.${NC}"
-            echo -e "${BOLD_WHITE}Alternatively, you can download or purchase the tool from store.xss0r.com. ${NC}"
-            echo -e "${BOLD_WHITE}After obtaining the tool, execute the xss0r to enter your API key, and then proceed with the xss0rRecon tool.${NC}"
-        fi
-        
-        # Check if xss-urls.txt file is missing
-        if [ ! -f "xss-urls.txt" ]; then
-            echo -e "${RED}The xss-urls.txt file is not present in the current directory. Please make sure the file is generated or placed in the directory and try again. Alternatively, you can download or purchase the tool from store.xss0r.com. After obtaining the tool, execute the xss0r to enter your API key, and then proceed with the xss0rRecon tool.${NC}"
-        fi
-    fi
-}
 
 # Function for Path-based XSS
 run_path_based_xss() {
@@ -2274,12 +2160,12 @@ if [[ -f $reflection_script ]]; then
 while true; do
     # Display options
     display_options
-    read -p "Enter your choice [1-12]: " choice
+    read -p "Enter your choice [1-10]: " choice
 
-    # Check if the selected option is in the correct order
-    if [[ $choice -ge 2 && $choice -le 8 && $choice -ne 4 ]]; then
+    # Check if the selected option is in the correct order (options 2-7 must be done sequentially)
+    if [[ $choice -ge 2 && $choice -le 7 && $choice -ne 4 ]]; then
         if [[ $choice -gt $((last_completed_option + 1)) ]]; then
-            echo -e "${RED}Please respect order one by one from 1-8, you can't skip previous Options${NC}"
+            echo -e "${RED}Please respect order one by one from 1-7, you can't skip previous Options${NC}"
             continue
         fi
     fi
@@ -2293,7 +2179,7 @@ while true; do
             read -p "Please enter a domain name (example.com): " domain_name
             echo -e "${BOLD_WHITE}You selected: Domain name set to $domain_name${NC}"
             last_completed_option=2
-            
+
             # Automatically proceed to Step 3 after setting the domain name
             read -p "$(echo -e "${BOLD_WHITE}Do you want to proceed with domain enumeration and filtering for $domain_name (Y/N)?: ${NC}")" proceed_to_step_3
             if [[ "$proceed_to_step_3" =~ ^[Yy]$ ]]; then
@@ -2344,32 +2230,20 @@ while true; do
                 last_completed_option=7
             fi
             ;;
-        8)
-            if [ -z "$domain_name" ]; then
-                echo "Domain name is not set. Please select option 2 to set the domain name."
-            else
-                run_step_8
-                last_completed_option=8
-            fi
+        8) # Path-based XSS Detection
+            run_path_based_xss
+            last_completed_option=8
             ;;
-        9)
+        9) # Domains Search Inputs
+            run_domains_search_input
+            last_completed_option=9
+            ;;
+        10) # Exit
             echo "Exiting script."
             exit 0
             ;;
-        10)
-            echo -e "${BOLD_WHITE}You selected: Guide to Deploying xss0r on VPS Servers${NC}"
-            show_vps_info
-            ;;
-       11) # Execute Path-based XSS
-            run_path_based_xss
-            last_completed_option=11
-            ;;
-        12) # Domains Search Input
-            run_domains_search_input
-            last_completed_option=12
-            ;;
         *)
-            echo "Invalid option. Please select a number between 1 and 11."
+            echo "Invalid option. Please select a number between 1 and 10."
             ;;
     esac
 done

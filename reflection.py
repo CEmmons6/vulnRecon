@@ -11,25 +11,42 @@ TIMEOUT = 10
 total_urls = 0
 processed_urls = 0
 
-# ANSI escape sequences for color
+# ANSI escape sequences for color - vulnRecon Theme
 BOLD = '\033[1m'
+DIM = '\033[2m'
 RED = '\033[91m'
 BOLD_RED = '\033[1;91m'
 GREEN = '\033[92m'
+BRIGHT_GREEN = '\033[1;92m'
 BLUE = '\033[94m'
+CYAN = '\033[96m'
+BOLD_CYAN = '\033[1;96m'
+MAGENTA = '\033[95m'
+BOLD_MAGENTA = '\033[1;95m'
+YELLOW = '\033[93m'
+BOLD_YELLOW = '\033[1;93m'
+BOLD_WHITE = '\033[1;97m'
+BOLD_GREEN = '\033[1;92m'
 RESET = '\033[0m'
 
 def print_banner():
     banner = f"""
-    {GREEN}#########################################{RESET}
-    {GREEN}#                                       #{RESET}
-    {GREEN}#        {BOLD}XSS Reflection Checker V2 {RESET}{GREEN}        #{RESET}
-    {GREEN}#        {BOLD}Developed by Ibrahim{RESET}{GREEN}        #{RESET}
-    {GREEN}#                                       #{RESET}
-    {GREEN}#########################################{RESET}
-    {BOLD}Usage:{RESET}                                #
-    python reflection.py urls.txt --threads 2
-    """
+{BOLD_CYAN}             .__        __________
+___  ____ __|  |   ____\\______   \\ ____   ____  ____   ____
+\\  \\/ /  |  \\  |  /    \\|       _// __ \\_/ ___\\/  _ \\ /    \\
+ \\   /|  |  /  |_|   |  \\    |   \\  ___/\\  \\__(  <_> )   |  \\
+  \\_/ |____/|____/___|  /____|_  /\\___  >\\___  >____/|___|  /
+                      \\/       \\/     \\/     \\/           \\/ {RESET}
+{BOLD_MAGENTA}             .__        __________
+___  ____ __|  |   ____\\______   \\ ____   ____  ____   ____
+\\  \\/ /  |  \\  |  /    \\|       _// __ \\_/ ___\\/  _ \\ /    \\
+ \\   /|  |  /  |_|   |  \\    |   \\  ___/\\  \\__(  <_> )   |  \\
+  \\_/ |____/|____/___|  /____|_  /\\___  >\\___  >____/|___|  /
+                      \\/       \\/     \\/     \\/           \\/ {RESET}
+{BOLD_CYAN}════════════════════════════════════════════════════════════════════════════════
+{BOLD_MAGENTA}    ■ Vulnerability Reconnaissance Framework{RESET}{BOLD_CYAN}
+{BOLD_WHITE}    Query Parameter XSS Detection v2.0{RESET}{BOLD_CYAN}
+═════════════════════════════════════════════════════════════════════════════════{RESET}"""
     print(banner)
 
 def save_reflected_url(original_url, param_name, modified_params, output_file):
@@ -45,7 +62,7 @@ def save_reflected_url(original_url, param_name, modified_params, output_file):
     with open(output_file, 'a') as f:
         f.write(payload_url + '\n')
 
-    print(f"{GREEN}[SAVED] {payload_url}{RESET}")
+    print(f"{BRIGHT_GREEN}[✓ SAVED]{RESET} {CYAN}{payload_url}{RESET}")
 
 def check_reflection(url, output_file):
     global processed_urls
@@ -58,15 +75,15 @@ def check_reflection(url, output_file):
         for param in parsed_url.query.split("&"):
             key_value = param.split("=")
             if len(key_value) == 1 or key_value[1] == "":
-                query_params[key_value[0]] = ["ibrahimXSS"]
+                query_params[key_value[0]] = ["vulnReconXSS"]
 
         # Process each parameter individually
         for param in query_params:
             # Make a deep copy of query parameters to modify only one at a time
             modified_params = {k: v[:] for k, v in query_params.items()}
 
-            # Temporarily set the current parameter to `ibrahimXSS`
-            modified_params[param] = ['ibrahimXSS']
+            # Temporarily set the current parameter to `vulnReconXSS`
+            modified_params[param] = ['vulnReconXSS']
 
             # Reconstruct the modified URL
             query = "&".join(f"{k}={','.join(v)}" if isinstance(v, list) else f"{k}={v}" for k, v in modified_params.items())
@@ -75,29 +92,29 @@ def check_reflection(url, output_file):
             # Make a request with a timeout
             response = requests.get(modified_url, timeout=TIMEOUT)
 
-            # Check if 'ibrahimXSS' is reflected in the response
-            if 'ibrahimXSS' in response.text:
-                print(f"{GREEN}[+] Reflection found on {modified_url} for parameter '{BOLD_RED}{param}{RESET}'")
+            # Check if 'vulnReconXSS' is reflected in the response
+            if 'vulnReconXSS' in response.text:
+                print(f"{BRIGHT_GREEN}[+] REFLECTION FOUND{RESET} {CYAN}{modified_url}{RESET} {YELLOW}→{RESET} param: {BOLD_RED}{param}{RESET}")
 
                 # Save URL with {payload} replacing only the current parameter
                 save_reflected_url(url, param, modified_params, output_file)
 
     except requests.exceptions.Timeout:
-        print(f"{RED}[!] Connection Timeout: {url}{RESET}")
+        print(f"{RED}[!] TIMEOUT{RESET} {DIM}{url}{RESET}")
         time.sleep(2)
     except requests.exceptions.RequestException:
-        print(f"{RED}[!] Connection Timeout: {url}{RESET}")
+        print(f"{RED}[!] ERROR{RESET} {DIM}{url}{RESET}")
         time.sleep(2)
     finally:
         processed_urls += 1
-        print(f"{BLUE}[INFO] Progress: {processed_urls}/{total_urls} URLs processed.{RESET}")
+        print(f"{BLUE}[INFO]{RESET} Progress: {BOLD}{processed_urls}/{total_urls}{RESET} URLs processed")
 
 def main():
     global total_urls
 
     print_banner()
 
-    parser = argparse.ArgumentParser(description="Reflection Checker")
+    parser = argparse.ArgumentParser(description="vulnRecon Reflection Checker - Query Parameter XSS Detection")
     parser.add_argument("file_path", type=str, help="Path to the text file containing URLs")
     parser.add_argument("--threads", type=int, default=5, help="Number of threads to use (default: 5)")
 
@@ -108,6 +125,7 @@ def main():
         with open(args.file_path, 'r') as f:
             urls = [line.strip() for line in f if line.strip()]
         total_urls = len(urls)
+        print(f"{BLUE}[INFO]{RESET} Loaded {BOLD}{total_urls}{RESET} URLs from {CYAN}{args.file_path}{RESET}")
     except Exception as e:
         print(f"{RED}Error reading file: {str(e)}{RESET}")
         return
@@ -117,6 +135,8 @@ def main():
 
     # Clear previous results in the output file
     open(output_file, 'w').close()
+
+    print(f"{YELLOW}[*] Starting reflection check with {args.threads} threads...{RESET}\n")
 
     threads = []
     for url in urls:
@@ -130,5 +150,15 @@ def main():
     for thread in threads:
         thread.join()
 
+    print(f"\n{MAGENTA}════════════════════════════════════════════════════════════════════════════════")
+    print(f"{BRIGHT_GREEN}[✓] SCAN COMPLETE{RESET} {MAGENTA}════════════════════════════════════════════════════════════════════════════════")
+    print(f"{BLUE}[INFO]{RESET} Results saved to: {CYAN}{output_file}{RESET}")
+    if os.path.exists(output_file):
+        with open(output_file, 'r') as f:
+            count = len(f.readlines())
+        print(f"{BLUE}[INFO]{RESET} Total reflected URLs found: {BOLD_RED}{count}{RESET}")
+    print(f"{MAGENTA}════════════════════════════════════════════════════════════════════════════════{RESET}")
+
 if __name__ == "__main__":
+    import os
     main()
