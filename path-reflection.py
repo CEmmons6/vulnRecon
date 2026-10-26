@@ -4,9 +4,13 @@ import argparse
 from urllib.parse import urlparse, urlunparse
 import time
 import os
+import sys
 
 # Set the timeout limit (in seconds)
 TIMEOUT = 10
+
+# Output directory for organized file management
+OUTPUT_DIR = "output"
 
 # Global variables to track progress
 total_urls = 0
@@ -31,6 +35,18 @@ BOLD_WHITE = '\033[1;97m'
 BOLD_GREEN = '\033[1;92m'
 RESET = '\033[0m'
 
+def ensure_output_dir():
+    """Create output directory if it doesn't exist"""
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+        print(f"{BLUE}[INFO]{RESET} Created output directory: {CYAN}{OUTPUT_DIR}{RESET}")
+
+def print_progress_percentage(current, total, prefix=""):
+    """Print progress as percentage"""
+    if total > 0:
+        percentage = (current / total) * 100
+        print(f"{BLUE}[INFO]{RESET} {prefix}Progress: {BOLD}{percentage:.1f}%{RESET} ({BOLD}{current}/{total}{RESET})")
+
 def print_banner():
     banner = f"""
 {BOLD_CYAN}             .__        __________
@@ -53,9 +69,15 @@ ___  ____ __|  |   ____\\______   \\ ____   ____  ____   ____
 
 def save_reflected_url(url, modified_path, output_file):
     """Save reflected URLs with '{payload}' replacing 'vulnReconXSS'"""
+    # Ensure output directory exists
+    ensure_output_dir()
+
+    # Use output directory for output file
+    output_path = os.path.join(OUTPUT_DIR, output_file)
+
     payload_url = urlunparse(url._replace(path=modified_path)).replace("vulnReconXSS", "{payload}")
     if payload_url not in saved_urls:
-        with open(output_file, 'a') as f:
+        with open(output_path, 'a') as f:
             f.write(payload_url + '\n')
         saved_urls.add(payload_url)
         print(f"{BRIGHT_GREEN}[✓ SAVED]{RESET} {CYAN}{payload_url}{RESET}")
@@ -133,17 +155,33 @@ def main():
     parser.add_argument("--threads", type=int, default=5, help="Number of threads to use (default: 5)")
     args = parser.parse_args()
 
+    # Ensure output directory exists
+    ensure_output_dir()
+
+    # Try to find input file in output directory first, then in current directory
+    input_file_path = args.file_path
+    if not os.path.exists(input_file_path):
+        # Try looking in output directory
+        output_input_path = os.path.join(OUTPUT_DIR, args.file_path)
+        if os.path.exists(output_input_path):
+            input_file_path = output_input_path
+            print(f"{BLUE}[INFO]{RESET} Found input file in output directory: {CYAN}{input_file_path}{RESET}")
+        else:
+            print(f"{RED}Error: Input file not found at {args.file_path} or {output_input_path}{RESET}")
+            return
+
     output_file = "path-xss.txt"
     processed_output = "path-xss-urls.txt"
 
-    # Clear previous results
-    open(output_file, 'w').close()
+    # Clear previous results (in output directory)
+    output_path = os.path.join(OUTPUT_DIR, output_file)
+    open(output_path, 'w').close()
 
     try:
-        with open(args.file_path, 'r') as f:
+        with open(input_file_path, 'r') as f:
             urls = [line.strip() for line in f if line.strip()]
         total_urls = len(urls)
-        print(f"{BLUE}[INFO]{RESET} Loaded {BOLD}{total_urls}{RESET} URLs from {CYAN}{args.file_path}{RESET}")
+        print(f"{BLUE}[INFO]{RESET} Loaded {BOLD}{total_urls}{RESET} URLs from {CYAN}{input_file_path}{RESET}")
     except Exception as e:
         print(f"{RED}Error: {str(e)}{RESET}")
         return
@@ -162,18 +200,26 @@ def main():
     for thread in threads:
         thread.join()
 
+    # Wait 5 seconds after completion and print progress
+    print(f"\n{BLUE}[INFO]{RESET} Scan completed. Waiting 5 seconds before finalizing...")
+    for i in range(1, 6):
+        time.sleep(1)
+        print_progress_percentage(i, 5, "Finalizing ")
+
     # Post-process URLs
-    if os.path.isfile(output_file):
+    if os.path.isfile(output_path):
         print(f"\n{CYAN}[*] Reflection check complete. Post-processing results...{RESET}")
-        post_process_urls(output_file, processed_output)
+        # Post-process to output directory
+        processed_output_path = os.path.join(OUTPUT_DIR, processed_output)
+        post_process_urls(output_path, processed_output_path)
     else:
-        print(f"{RED}[!] Error: {output_file} was not generated.{RESET}")
+        print(f"{RED}[!] Error: {output_path} was not generated.{RESET}")
 
     print(f"\n{MAGENTA}════════════════════════════════════════════════════════════════════════════════")
     print(f"{BRIGHT_GREEN}[✓] SCAN COMPLETE{RESET} {MAGENTA}════════════════════════════════════════════════════════════════════════════════")
-    print(f"{BLUE}[INFO]{RESET} Results saved to: {CYAN}{processed_output}{RESET}")
-    if os.path.exists(processed_output):
-        with open(processed_output, 'r') as f:
+    print(f"{BLUE}[INFO]{RESET} Results saved to: {CYAN}{processed_output_path}{RESET}")
+    if os.path.exists(processed_output_path):
+        with open(processed_output_path, 'r') as f:
             count = len(f.readlines())
         print(f"{BLUE}[INFO]{RESET} Total path-reflected URLs found: {BOLD_RED}{count}{RESET}")
     print(f"{MAGENTA}════════════════════════════════════════════════════════════════════════════════{RESET}")
